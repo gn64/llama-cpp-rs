@@ -234,7 +234,7 @@ fn integration_embeddings() {
 
     let last = batch.n_tokens() - 1;
     let emb = ctx.embeddings_ith(last).expect("token embedding");
-    assert_eq!(emb.len(), model.n_embd() as usize);
+    assert_eq!(emb.len(), model.n_embd_out() as usize);
     assert!(emb.iter().any(|x| *x != 0.0));
 }
 

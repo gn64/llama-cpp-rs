@@ -357,7 +357,7 @@ impl<'model> LlamaContext<'model> {
     /// # Returns
     ///
     /// A slice containing the embeddings for the last decoded batch of the given token.
-    /// The size corresponds to the `n_embd` parameter of the context's model.
+    /// The size corresponds to the `n_embd_out` parameter of the context's model.
     ///
     /// # Errors
     ///
@@ -367,14 +367,14 @@ impl<'model> LlamaContext<'model> {
     ///
     /// # Panics
     ///
-    /// * `n_embd` does not fit into a usize
+    /// * `n_embd_out` does not fit into a usize
     pub fn embeddings_ith(&self, i: i32) -> Result<&[f32], EmbeddingsError> {
         if !self.embeddings_enabled {
             return Err(EmbeddingsError::NotEnabled);
         }
 
-        let n_embd =
-            usize::try_from(self.model.n_embd()).expect("n_embd does not fit into a usize");
+        let n_embd_out =
+            usize::try_from(self.model.n_embd_out()).expect("n_embd_out does not fit into a usize");
 
         unsafe {
             let embedding = llama_cpp_sys_4::llama_get_embeddings_ith(self.context.as_ptr(), i);
@@ -382,7 +382,7 @@ impl<'model> LlamaContext<'model> {
             if embedding.is_null() {
                 Err(EmbeddingsError::LogitsNotEnabled)
             } else {
-                Ok(slice::from_raw_parts(embedding, n_embd))
+                Ok(slice::from_raw_parts(embedding, n_embd_out))
             }
         }
     }
